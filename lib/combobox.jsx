@@ -346,7 +346,7 @@ module.exports = React.createClass({
     React.Children.forEach(this.props.children, function(child) {
       if (this.props.valueComparator(child.props.value, value))
         inputValue = getLabel(child);
-    });
+    }.bind(this));
     return inputValue || value;
   },
 
