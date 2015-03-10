@@ -3,6 +3,7 @@
 var React = require('react');
 var guid = 0;
 var k = function(){};
+var eq = function(a,b){return a===b};
 var addClass = require('./add-class');
 var ComboboxOption = require('./option');
 
@@ -43,6 +44,17 @@ module.exports = React.createClass({
     onSelect: React.PropTypes.func,
 
     /**
+     * Function used to compare Option values instead of the default `===`.
+     *
+     * Signature:
+     *
+     * ```js
+     * function(value1, value2){} => bool
+     * ```
+    */
+    valueComparator: React.PropTypes.func,
+
+    /**
      * The initial value of the component.
     */
     value: React.PropTypes.any
@@ -53,6 +65,7 @@ module.exports = React.createClass({
       autocomplete: 'both',
       onInput: k,
       onSelect: k,
+      valueComparator: eq,
       value: null
     };
   },
@@ -103,7 +116,7 @@ module.exports = React.createClass({
        isEmpty = false;
       // TODO: cloneWithProps and map instead of altering the children in-place
       var props = child.props;
-      if (this.state.value === props.value) {
+      if (this.props.valueComparator(this.state.value, props.value)) {
         // need an ID for WAI-ARIA
         props.id = props.id || 'rf-combobox-selected-'+(++guid);
         props.isSelected = true
@@ -317,7 +330,7 @@ module.exports = React.createClass({
   focusSelectedOption: function() {
     var selectedIndex;
     React.Children.forEach(this.props.children, function(child, index) {
-      if (child.props.value === this.state.value)
+      if (this.props.valueComparator(child.props.value, this.state.value))
         selectedIndex = index;
     }.bind(this));
     this.showList();
@@ -331,7 +344,7 @@ module.exports = React.createClass({
     // TODO: might not need this, we should know this in `makeMenu`
     var inputValue;
     React.Children.forEach(this.props.children, function(child) {
-      if (child.props.value === value)
+      if (this.props.valueComparator(child.props.value, value))
         inputValue = getLabel(child);
     });
     return inputValue || value;
