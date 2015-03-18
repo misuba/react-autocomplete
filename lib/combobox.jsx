@@ -306,7 +306,8 @@ module.exports = React.createClass({
       matchedAutocompleteOption: null
     }, function() {
       this.props.onSelect(child.props.value, child);
-      this.hideList();
+      if (options.hide !== false)
+        this.hideList();
       if (options.focus !== false)
         this.selectInput();
     }.bind(this));
@@ -362,6 +363,13 @@ module.exports = React.createClass({
     this.setState({
       focusedIndex: index
     }, this.focusOption);
+
+    // Select the focused option:
+    var focusedChild;
+    React.Children.forEach(this.props.children, function(child, childIndex) {
+      if (childIndex === index) focusedChild = child;
+    });
+    this.selectOption(focusedChild, {focus: false, hide: false});
   },
 
   focusOption: function() {
