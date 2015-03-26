@@ -4,7 +4,33 @@ var k = function(){};
 var eq = function(a,b){return a===b};
 var addClass = require('./add-class');
 var ComboboxOption = require('./option');
-var Portal = require('./portal');
+
+
+var Portal = React.createClass({
+  componentDidMount() {
+    this.node = document.createElement('div');
+    this.node.style.display = 'inline';
+    document.body.appendChild(this.node);
+    this.renderPortal(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.renderPortal(nextProps);
+  },
+
+  componentWillUnmount() {
+    document.body.removeChild(this.node);
+  },
+
+  renderPortal(props) {
+    var container = React.createElement('div', {style: {display: 'inline'}}, props.children);
+    React.render(container, this.node);
+  },
+
+  render() {
+    return null;
+  }
+});
 
 
 module.exports = React.createClass({
@@ -267,7 +293,8 @@ module.exports = React.createClass({
     var handlerName = this.inputKeydownMap[event.keyCode];
     if (!handlerName)
       return
-    event.preventDefault();
+    if (this.state.isOpen)
+      event.preventDefault();
     this.setState({usingKeyboard: true});
     this[handlerName].call(this);
   },
