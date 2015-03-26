@@ -4,6 +4,8 @@ var k = function(){};
 var eq = function(a,b){return a===b};
 var addClass = require('./add-class');
 var ComboboxOption = require('./option');
+var Portal = require('./portal');
+
 
 module.exports = React.createClass({
 
@@ -375,6 +377,23 @@ module.exports = React.createClass({
     this.refs.list.getDOMNode().childNodes[index].focus();
   },
 
+  portalStyles: function() {
+    var input = this.refs.input;
+    if (!input)
+      return {};
+    else {
+      var node = input.getDOMNode();
+      var inputBox = node.getBoundingClientRect();
+      return {
+        position: 'absolute',
+        top: inputBox.bottom,
+        left: inputBox.left,
+        width: node.clientWidth,
+        display: this.state.isOpen ? 'block' : 'none'
+      };
+    }
+  },
+
   render: function() {
     return (
       <div className={this.getClassName()}>
@@ -398,13 +417,14 @@ module.exports = React.createClass({
           className="rf-combobox-button"
           onClick={this.handleButtonClick}
         >▾</span>
-        <div
+        <Portal><div
+          style={this.portalStyles()}
           id={this.state.listId}
           ref="list"
           className="rf-combobox-list"
           aria-expanded={this.state.isOpen+''}
           role="listbox"
-        >{this.state.menu.children}</div>
+        >{this.state.menu.children}</div></Portal>
       </div>
     );
   }
