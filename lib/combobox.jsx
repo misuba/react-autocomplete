@@ -57,7 +57,12 @@ module.exports = React.createClass({
     /**
      * The initial value of the component.
     */
-    value: React.PropTypes.any
+    value: React.PropTypes.any,
+
+    /**
+     * The tabIndex of the autocomplete input.
+    */
+    tabIndex: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -401,6 +406,7 @@ module.exports = React.createClass({
           ref="input"
           placeholder={this.props.placeholder}
           className="rf-combobox-input"
+          tabIndex={this.props.tabIndex}
           defaultValue={this.props.value}
           value={this.state.inputValue}
           onChange={this.handleInputChange}
