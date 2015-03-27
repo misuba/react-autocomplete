@@ -177,14 +177,15 @@ module.exports = React.createClass({
    * When the user begins typing again we need to clear out any state that has
    * to do with an existing or potential selection.
   */
-  clearSelectedState: function(cb) {
-    this.setState({
+  clearSelectedState: function(cb, overrides) {
+    var newState = Object.assign({}, {
       focusedIndex: null,
       inputValue: null,
       value: null,
       matchedAutocompleteOption: null,
       activedescendant: null
-    }, cb);
+    }, overrides);
+    this.setState(newState, cb);
   },
 
   handleInputChange: function(event) {
@@ -193,7 +194,7 @@ module.exports = React.createClass({
       this.props.onInput(value);
       if (!this.state.isOpen)
         this.showList();
-    }.bind(this));
+    }.bind(this), {inputValue: value});
   },
 
   handleInputBlur: function() {
