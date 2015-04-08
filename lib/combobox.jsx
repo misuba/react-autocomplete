@@ -6,33 +6,6 @@ var addClass = require('./add-class');
 var ComboboxOption = require('./option');
 
 
-var Portal = React.createClass({
-  componentDidMount() {
-    this.node = document.createElement('div');
-    this.node.style.display = 'inline';
-    document.body.appendChild(this.node);
-    this.renderPortal(this.props);
-  },
-
-  componentWillReceiveProps(nextProps) {
-    this.renderPortal(nextProps);
-  },
-
-  componentWillUnmount() {
-    document.body.removeChild(this.node);
-  },
-
-  renderPortal(props) {
-    var container = React.createElement('div', {style: {display: 'inline'}}, props.children);
-    React.render(container, this.node);
-  },
-
-  render() {
-    return null;
-  }
-});
-
-
 module.exports = React.createClass({
 
   propTypes: {
@@ -112,7 +85,6 @@ module.exports = React.createClass({
       // this prevents crazy jumpiness since we focus options on mouseenter
       usingKeyboard: false,
       activedescendant: null,
-      listId: 'rf-combobox-list-'+(++guid),
       menu: {
         children: [],
         activedescendant: null,
@@ -417,12 +389,17 @@ module.exports = React.createClass({
     else {
       var node = input.getDOMNode();
       var inputBox = node.getBoundingClientRect();
+      var windowHeight;
+      if (window.innerHeight) {
+        windowHeight = window.innerHeight;
+      } else {
+        windowHeight = document.documentElement.clientHeight;
+      }
       return {
         position: 'absolute',
-        top: inputBox.bottom,
-        left: inputBox.left,
-        width: node.clientWidth,
-        display: this.state.isOpen ? 'block' : 'none'
+        display: this.state.isOpen ? 'block' : 'none',
+        overflow: 'scroll',
+        maxHeight: windowHeight - inputBox.bottom
       };
     }
   },
@@ -444,21 +421,21 @@ module.exports = React.createClass({
           role="combobox"
           aria-activedescendant={this.state.menu.activedescendant}
           aria-autocomplete={this.props.autocomplete}
-          aria-owns={this.state.listId}
+          aria-owns="react-autocomplete-results"
         />
         <span
           aria-hidden="true"
           className="rf-combobox-button"
           onClick={this.handleButtonClick}
         >▾</span>
-        <Portal><div
+        <div style={{position: 'relative'}}><div
           style={this.portalStyles()}
-          id={this.state.listId}
+          id="react-autocomplete-results"
           ref="list"
           className="rf-combobox-list"
           aria-expanded={this.state.isOpen+''}
           role="listbox"
-        >{this.state.menu.children}</div></Portal>
+        >{this.state.menu.children}</div></div>
       </div>
     );
   }
@@ -478,4 +455,3 @@ function matchFragment(userInput, firstChildLabel) {
     return false;
   return true;
 }
-
