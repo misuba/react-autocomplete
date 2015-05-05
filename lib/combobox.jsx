@@ -127,6 +127,7 @@ module.exports = React.createClass({
       }
       props.onBlur = this.handleOptionBlur;
       props.onClick = this.selectOption.bind(this, child);
+      props.onTouchEnd = (evt) => { if (!this.cancelSelect) this.selectOption(child);};
       props.onFocus = this.handleOptionFocus;
       props.onKeyDown = this.handleOptionKeyDown.bind(this, child);
       props.onMouseEnter = this.handleOptionMouseEnter.bind(this, index);
@@ -434,6 +435,8 @@ module.exports = React.createClass({
           ref="list"
           className="rf-combobox-list"
           aria-expanded={this.state.isOpen+''}
+          onTouchStart={(evt) => { this.cancelSelect = false; }}
+          onTouchMove={(evt) => { this.cancelSelect = true; }}
           role="listbox"
         >{this.state.menu.children}</div></div>
       </div>
