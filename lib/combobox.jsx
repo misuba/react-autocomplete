@@ -113,7 +113,7 @@ module.exports = React.createClass({
     var isEmpty = true;
     children = children || this.props.children;
     React.Children.forEach(children, function(child, index) {
-      if (child.type !== ComboboxOption.type)
+      if (child === null || child.type !== ComboboxOption.type)
         // allow random elements to live in this list
         return;
        isEmpty = false;
