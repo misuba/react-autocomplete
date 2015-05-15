@@ -43,6 +43,18 @@ module.exports = React.createClass({
     onSelect: React.PropTypes.func,
 
     /**
+     * Called when the combobox is *closed* via making a selection (with
+     * the enter key or a click).
+     *
+     * Signature:
+     *
+     * ```js
+     * function(selectedValue){}
+     * ```
+    */
+    onSelectDismiss: React.PropTypes.func,
+
+    /**
      * Function used to compare Option values instead of the default `===`.
      *
      * Signature:
@@ -69,6 +81,7 @@ module.exports = React.createClass({
       autocomplete: 'both',
       onInput: k,
       onSelect: k,
+      onSelectDismiss: k,
       valueComparator: eq,
       value: null
     };
@@ -233,7 +246,9 @@ module.exports = React.createClass({
   },
 
   hideList: function() {
-    this.setState({isOpen: false});
+    if (this.isMounted()) {
+      this.setState({isOpen: false});
+    }
   },
 
   hideOnEscape: function() {
@@ -312,8 +327,10 @@ module.exports = React.createClass({
       matchedAutocompleteOption: null
     }, function() {
       this.props.onSelect(child.props.value, child);
-      if (options.hide !== false)
+      if (options.hide !== false) {
+        this.props.onSelectDismiss(child.props.value, child);
         this.hideList();
+      }
       if (options.focus !== false)
         this.selectInput();
     }.bind(this));
