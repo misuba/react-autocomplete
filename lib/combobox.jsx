@@ -428,6 +428,7 @@ module.exports = React.createClass({
         <input
           ref="input"
           placeholder={this.props.placeholder}
+          disabled={this.props.disabled}
           className="rf-combobox-input"
           tabIndex={this.props.tabIndex}
           defaultValue={this.props.value}
