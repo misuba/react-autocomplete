@@ -459,14 +459,24 @@ module.exports = React.createClass({
         var index = this.state.focusedIndex;
         React.findDOMNode(this.refs.list).childNodes[index].focus();
     },
+    
+    recordBoundingBox: function() {
+        var node = React.findDOMNode(input);
+        this._rect = node.getBoundingClientRect();
+    },
+    
+    componentDidMount: function() {
+        this.recordBoundingBox();
+    },
+    componentDidUpdate: function() {
+        this.recordBoundingBox();
+    },
 
     portalStyles: function() {
         var input = this._input;
         if (!input) {
             return {};
         } else {
-            var node = React.findDOMNode(input);
-            var inputBox = node.getBoundingClientRect();
             var windowHeight;
             if (window.innerHeight) {
                 windowHeight = window.innerHeight;
@@ -477,7 +487,7 @@ module.exports = React.createClass({
                 position: 'absolute',
                 display: this.state.isOpen ? 'block' : 'none',
                 overflow: 'scroll',
-                maxHeight: windowHeight - inputBox.bottom
+                maxHeight: this._rect ? windowHeight - this._rect.bottom : 0
             };
         }
     },
