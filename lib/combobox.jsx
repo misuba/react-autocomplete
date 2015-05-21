@@ -461,7 +461,7 @@ module.exports = React.createClass({
     },
 
     recordBoundingBox: function() {
-        var node = React.findDOMNode(input);
+        var node = React.findDOMNode(this._input);
         this._rect = node.getBoundingClientRect();
     },
 
