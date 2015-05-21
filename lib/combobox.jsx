@@ -276,31 +276,39 @@ module.exports = React.createClass({
         var activedescendant;
         var isEmpty = true;
         children = children || this.props.children;
-        React.Children.forEach(children, function(child, index) {
-            if (child === null || child.type !== ComboboxOption.type) {
+        var newChildren = React.Children.map(children, function(child, index) {
+            if (child === null || child.type !== ComboboxOption) {
                 // allow random elements to live in this list
-                return;
+                return child;
             }
             isEmpty = false;
-            // TODO: cloneWithProps and map instead of altering the children in-place
-            var props = child.props;
-            if (this.props.valueComparator(this.state.value, props.value)) {
-                // need an ID for WAI-ARIA
-                props.id = props.id || 'rf-combobox-selected-'+(++guid);
-                props.isSelected = true
-                activedescendant = props.id;
+
+            var valueMatch = this.props.valueComparator(
+                this.state.value, child.props.value
+            );
+            // need an ID for WAI-ARIA
+            var newId = valueMatch ?
+                child.props.id || 'rf-combobox-selected-'+(++guid)
+                :
+                child.props.id;
+            if (valueMatch) {
+                activedescendant = newId;
             }
-            props.onBlur = this.handleOptionBlur;
-            props.onClick = this.selectOption.bind(this, child);
-            props.onTouchEnd = (evt) => {
-                if (!this.cancelSelect) this.selectOption(child);
-            };
-            props.onFocus = this.handleOptionFocus;
-            props.onKeyDown = this.handleOptionKeyDown.bind(this, child);
-            props.onMouseEnter = this.handleOptionMouseEnter.bind(this, index);
+            return React.cloneElement(child, {
+                id: newId,
+                isSelected: valueMatch,
+                onBlur: this.handleOptionBlur,
+                onClick: this.selectOption.bind(this, child),
+                onTouchEnd: function(evt) {
+                    if (!this.cancelSelect) { this.selectOption(child); }
+                }.bind(this),
+                onFocus: this.handleOptionFocus,
+                onKeyDown: this.handleOptionKeyDown.bind(this, child),
+                onMouseEnter: this.handleOptionMouseEnter.bind(this, index)
+            );
         }.bind(this));
         return {
-            children: children,
+            children: newChildren,
             activedescendant: activedescendant,
             isEmpty: isEmpty
         };
