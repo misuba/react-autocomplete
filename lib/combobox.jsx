@@ -288,7 +288,7 @@ module.exports = React.createClass({
             );
             // need an ID for WAI-ARIA
             var newId = valueMatch ?
-                child.props.id || 'rf-combobox-selected-'+(++guid)
+                (child.props.id || 'rf-combobox-selected-'+(++guid))
                 :
                 child.props.id;
             if (valueMatch) {
@@ -299,13 +299,13 @@ module.exports = React.createClass({
                 isSelected: valueMatch,
                 onBlur: this.handleOptionBlur,
                 onClick: this.selectOption.bind(this, child),
-                onTouchEnd: function(evt) {
+                onTouchEnd: function() {
                     if (!this.cancelSelect) { this.selectOption(child); }
                 }.bind(this),
                 onFocus: this.handleOptionFocus,
                 onKeyDown: this.handleOptionKeyDown.bind(this, child),
                 onMouseEnter: this.handleOptionMouseEnter.bind(this, index)
-            );
+            }, child.props.children);
         }.bind(this));
         return {
             children: newChildren,
@@ -459,12 +459,12 @@ module.exports = React.createClass({
         var index = this.state.focusedIndex;
         React.findDOMNode(this.refs.list).childNodes[index].focus();
     },
-    
+
     recordBoundingBox: function() {
         var node = React.findDOMNode(input);
         this._rect = node.getBoundingClientRect();
     },
-    
+
     componentDidMount: function() {
         this.recordBoundingBox();
     },
