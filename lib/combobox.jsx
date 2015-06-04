@@ -497,7 +497,6 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var value = null; // this.state.inputValue;
         return (
             <div className={this.getClassName()}>
                 <input
