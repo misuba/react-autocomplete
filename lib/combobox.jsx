@@ -128,9 +128,13 @@ module.exports = React.createClass({
     },
 
     componentWillReceiveProps: function(newProps) {
-        this.setState({
+        var newState = {
             menu: this.makeMenu(newProps.children)
-        });
+        };
+        if (newProps.value && newProps.value !== this.props.value) {
+            newState.inputValue = this.findInputValue(newProps.value);
+        }
+        this.setState(newState);
     },
 
     // ***** PART THE FIRST: turn browser events into 2nd-order events ********
@@ -185,22 +189,6 @@ module.exports = React.createClass({
         this.autocompleteInputValue();
     },
 
-    inputKeydownMap: {
-        38: 'focusPrevious',
-        40: 'focusNext',
-        27: 'hideOnEscape',
-        13: 'selectOnEnter'
-    },
-
-    optionKeydownMap: {
-        38: 'focusPrevious',
-        40: 'focusNext',
-        13: 'selectOption',
-        27: 'hideOnEscape'
-    },
-
-    // **** PART THE SECOND: dispatch on second-order events *********
-
     handleInputChange: function(event) {
         var value = React.findDOMNode(this._input).value;
         this.clearSelectedState(function() {
@@ -219,6 +207,22 @@ module.exports = React.createClass({
         this.maybeSelectAutocompletedOption();
         this.hideList();
     },
+
+    inputKeydownMap: {
+        38: 'focusPrevious',
+        40: 'focusNext',
+        27: 'hideOnEscape',
+        13: 'selectOnEnter'
+    },
+
+    optionKeydownMap: {
+        38: 'focusPrevious',
+        40: 'focusNext',
+        13: 'selectOption',
+        27: 'hideOnEscape'
+    },
+
+    // **** PART THE SECOND: dispatch on second-order events *********
 
     handleOptionBlur: function() {
         // don't want to hide the list if we focused another option
@@ -493,6 +497,7 @@ module.exports = React.createClass({
     },
 
     render: function() {
+        var value = null; // this.state.inputValue;
         return (
             <div className={this.getClassName()}>
                 <input
