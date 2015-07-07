@@ -48,6 +48,20 @@ module.exports = React.createClass({
         onInput: React.PropTypes.func,
 
         /**
+         * Called when the combobox receives a keyUp of user input, as opposed to
+         * onInput which goes off on change events only. This callback gets passed
+         * the raw event.
+         *
+         * Signature:
+         *
+         * ```js
+         * function(event){}
+         * ```
+        */
+        onInputKeyUp: React.PropTypes.func,
+
+
+        /**
          * Called when the combobox receives a selection. You probably want to reset
          * the options to the full list at this point.
          *
@@ -178,6 +192,9 @@ module.exports = React.createClass({
     },
 
     handleInputKeyUp: function(event) {
+        if (this.props.onInputKeyUp && this.props.onInputKeyUp(event)===false) {
+            return;
+        }
         if (
             this.state.menu.isEmpty ||
             // autocompleting while backspacing feels super weird, so let's not
