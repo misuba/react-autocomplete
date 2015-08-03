@@ -74,6 +74,17 @@ module.exports = React.createClass({
         onFocusOption: React.PropTypes.func,
 
         /**
+         * Called when the combobox is blurred.
+         *
+         * Signature:
+         *
+         * ```js
+         * function(){}
+         * ```
+        */
+        onBlur: React.PropTypes.func,
+
+        /**
          * Called when the combobox is *closed* via making a selection (with
          * the enter key or a click).
          *
@@ -112,6 +123,7 @@ module.exports = React.createClass({
             autocomplete: 'both',
             onInput: k,
             onFocusOption: k,
+            onBlur: k,
             onSelect: k,
             valueComparator: eq,
             value: null
@@ -216,7 +228,7 @@ module.exports = React.createClass({
         }.bind(this), {inputValue: value});
     },
 
-    handleInputBlur: function() {
+    handleInputBlur: function(event) {
         var focusedAnOption = this.state.focusedIndex != null;
         if (focusedAnOption) {
             return;
@@ -261,6 +273,7 @@ module.exports = React.createClass({
         if (this.isMounted()) {
             this.setState({isOpen: false});
         }
+        this.props.onBlur();
     },
 
     hideOnEscape: function() {
@@ -477,7 +490,8 @@ module.exports = React.createClass({
     },
 
     focusOption: function() {
-        var index = this.state.focusedIndex;
+        var index = this.state.focusedIndex || 0;
+        console.log(React.findDOMNode(this.refs.list), index);
         React.findDOMNode(this.refs.list).childNodes[index].focus();
     },
 
