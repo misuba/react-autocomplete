@@ -553,7 +553,7 @@ module.exports = React.createClass({
                     onClick={this.handleButtonClick}
                 >▾</span>
                 <div style={{position: 'relative'}}>
-                    <div
+                    {React.Children.count(this.props.children) > 0 && <div
                         style={this.portalStyles()}
                         id="react-autocomplete-results"
                         ref="list"
@@ -563,7 +563,7 @@ module.exports = React.createClass({
                         onTouchMove={(evt) => { this.cancelSelect = true; }}
                         role="listbox"
                         >{this.state.menu.children}
-                    </div>
+                    </div>}
                 </div>
             </div>
         );
