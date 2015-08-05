@@ -491,7 +491,6 @@ module.exports = React.createClass({
 
     focusOption: function() {
         var index = this.state.focusedIndex || 0;
-        console.log(React.findDOMNode(this.refs.list), index);
         React.findDOMNode(this.refs.list).childNodes[index].focus();
     },
 
