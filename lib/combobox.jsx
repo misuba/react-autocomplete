@@ -115,7 +115,12 @@ module.exports = React.createClass({
         /**
          * The tabIndex of the autocomplete input.
         */
-        tabIndex: React.PropTypes.string
+        tabIndex: React.PropTypes.string,
+
+        /**
+         * The max-height to apply to the menu of autocomplete options
+        */
+        maxMenuHeight: React.PropTypes.number
     },
 
     getDefaultProps: function() {
@@ -126,7 +131,8 @@ module.exports = React.createClass({
             onBlur: k,
             onSelect: k,
             valueComparator: eq,
-            value: null
+            value: null,
+            maxMenuHeight: Infinity
         };
     },
 
@@ -521,7 +527,9 @@ module.exports = React.createClass({
                 position: 'absolute',
                 display: this.state.isOpen ? 'block' : 'none',
                 overflow: 'scroll',
-                maxHeight: this._rect ? windowHeight - this._rect.bottom : 0
+                maxHeight: this._rect
+                    ? Math.min(this.props.maxMenuHeight, windowHeight - this._rect.bottom)
+                    : 0
             };
         }
     },
