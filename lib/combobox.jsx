@@ -538,6 +538,7 @@ module.exports = React.createClass({
         return (
             <div className={this.getClassName()}>
                 <input
+                    type="text"
                     ref={(elm) => this._input = elm}
                     placeholder={this.props.placeholder}
                     disabled={this.props.disabled}
