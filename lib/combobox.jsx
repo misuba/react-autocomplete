@@ -183,6 +183,8 @@ module.exports = React.createClass({
         }
         if (this.state.isOpen) {
             event.preventDefault();
+        } else if (event.keyCode === 9) {
+            return;
         }
         this.setState({usingKeyboard: true});
         this[handlerName].call(this);
@@ -244,6 +246,7 @@ module.exports = React.createClass({
     },
 
     inputKeydownMap: {
+        9: 'focusNext',
         38: 'focusPrevious',
         40: 'focusNext',
         27: 'hideOnEscape',
@@ -251,6 +254,7 @@ module.exports = React.createClass({
     },
 
     optionKeydownMap: {
+        9: 'focusNext',
         38: 'focusPrevious',
         40: 'focusNext',
         13: 'selectOption',
