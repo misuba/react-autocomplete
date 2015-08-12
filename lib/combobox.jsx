@@ -273,17 +273,58 @@ module.exports = React.createClass({
         clearTimeout(this.blurTimer);
     },
 
+    /**
+     * Events that require the dropdown menu to check its size. For example, if
+     * the dropdown menu appears at the bottom of the page, it may be very
+     * short. See the showList() and hideList() methods.
+     */
+    menuEvents: [
+        'resize',
+        'scroll',
+        'orientationchange'
+    ],
+
     showList: function() {
         if (this.props.autocomplete.match(/both|list/)) {
             this.setState({isOpen: true});
         }
+        this.addMenuEventHandlers();
     },
 
     hideList: function() {
         if (this.isMounted()) {
             this.setState({isOpen: false});
         }
+        this.removeMenuEventHandlers();
         this.props.onBlur();
+    },
+
+    addMenuEventHandlers: function() {
+        this.menuEvents.forEach(eventName => {
+            if (window.addEventListener) {
+                window.addEventListener(eventName, this.handleMenuEvent);
+            } else {
+                window.attachEvent('on' + eventName, this.handleMenuEvent);
+            }
+        });
+    },
+
+    removeMenuEventHandlers: function() {
+        this.menuEvents.forEach(eventName => {
+            if (window.removeEventListener) {
+                window.removeEventListener(eventName, this.handleMenuEvent);
+            } else {
+                window.detachEvent('on' + eventName, this.handleMenuEvent);
+            }
+        });
+    },
+
+    handleMenuEvent: function(evt) {
+        this.forceUpdate();
+    },
+
+    componentWillUnmount: function() {
+        this.removeMenuEventHandlers();
     },
 
     hideOnEscape: function() {
