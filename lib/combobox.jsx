@@ -178,20 +178,21 @@ module.exports = React.createClass({
 
     handleKeydown: function(event) {
         var handlerName = this.inputKeydownMap[event.keyCode];
+        if (handlerName && event.keyCode !== 9) {
+            event.preventDefault();
+        }
         if (!handlerName) {
             return;
         }
-        if (this.state.isOpen) {
-            event.preventDefault();
-        } else if (event.keyCode === 9) {
-            return;
-        }
         this.setState({usingKeyboard: true});
-        this[handlerName].call(this);
+        this[handlerName].call(this, event);
     },
 
     handleOptionKeyDown: function(child, event) {
         var handlerName = this.optionKeydownMap[event.keyCode];
+        if (this.state.isOpen && event.keyCode === 9) {
+            return;
+        }
         if (!handlerName) {
             // if the user starts typing again while focused on an option, move focus
             // to the input, select so it wipes out any existing value
@@ -242,11 +243,11 @@ module.exports = React.createClass({
             return;
         }
         this.maybeSelectAutocompletedOption();
-        this.hideList();
+        this.hideList(event);
     },
 
     inputKeydownMap: {
-        9: 'focusNext',
+        9: 'selectFirstOption',
         38: 'focusPrevious',
         40: 'focusNext',
         27: 'hideOnEscape',
@@ -254,7 +255,6 @@ module.exports = React.createClass({
     },
 
     optionKeydownMap: {
-        9: 'focusNext',
         38: 'focusPrevious',
         40: 'focusNext',
         13: 'selectOption',
@@ -263,9 +263,11 @@ module.exports = React.createClass({
 
     // **** PART THE SECOND: dispatch on second-order events *********
 
-    handleOptionBlur: function() {
+    handleOptionBlur: function(event) {
         // don't want to hide the list if we focused another option
-        this.blurTimer = setTimeout(this.hideList, 0);
+        this.blurTimer = setTimeout(function() {
+            this.hideList(event);
+        }.bind(this), 0);
     },
 
     handleOptionFocus: function() {
@@ -291,12 +293,12 @@ module.exports = React.createClass({
         this.addMenuEventHandlers();
     },
 
-    hideList: function() {
+    hideList: function(event) {
         if (this.isMounted()) {
             this.setState({isOpen: false});
         }
         this.removeMenuEventHandlers();
-        this.props.onBlur();
+        this.props.onBlur(event);
     },
 
     addMenuEventHandlers: function() {
@@ -327,8 +329,8 @@ module.exports = React.createClass({
         this.removeMenuEventHandlers();
     },
 
-    hideOnEscape: function() {
-        this.hideList();
+    hideOnEscape: function(event) {
+        this.hideList(event);
         this.focusInput();
     },
 
@@ -382,7 +384,7 @@ module.exports = React.createClass({
             return React.cloneElement(child, {
                 id: newId,
                 isSelected: valueMatch,
-                onBlur: this.handleOptionBlur,
+                onBlur: function(evt) {this.handleOptionBlur(evt);}.bind(this),
                 onClick: this.selectOption.bind(this, child),
                 onTouchEnd: function() {
                     if (!this.cancelSelect) { this.selectOption(child); }
@@ -467,7 +469,7 @@ module.exports = React.createClass({
         }.bind(this));
     },
 
-    focusNext: function() {
+    focusNext: function(event) {
         if (this.state.menu.isEmpty) {
             return;
         }
@@ -478,7 +480,7 @@ module.exports = React.createClass({
         this.focusOptionAtIndex(index);
     },
 
-    focusPrevious: function() {
+    focusPrevious: function(event) {
         if (this.state.menu.isEmpty) {
             return;
         }
@@ -515,7 +517,7 @@ module.exports = React.createClass({
         return inputValue || value;
     },
 
-    focusOptionAtIndex: function(index) {
+    focusOptionAtIndex: function(index, andHide) {
         if (!this.state.isOpen && this.state.value) {
             return this.focusSelectedOption();
         }
@@ -537,7 +539,19 @@ module.exports = React.createClass({
                 focusedChild = child;
             }
         });
-        this.selectOption(focusedChild, {focus: false, hide: false});
+        this.selectOption(focusedChild, {focus: false, hide: andHide});
+    },
+
+    selectFirstOption: function(event) {
+        if (this.state.isOpen && !event.nativeEvent.shiftKey) {
+            event.preventDefault();
+            this.focusOptionAtIndex(0, true);
+            setTimeout(function() {
+                if (this.isMounted()) {
+                    this.focusInput();
+                }
+            }.bind(this), 1);
+        }
     },
 
     focusOption: function() {
